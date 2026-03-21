@@ -1,9 +1,9 @@
 return {
-  {
-    "stevearc/aerial.nvim",
-    opts = {},
-    keys = {
-      { "<leader>o", "<cmd>AerialToggle!<CR>", desc = "Toggle Outline" },
-    },
-  },
+  -- {
+  --   "stevearc/aerial.nvim",
+  --   opts = {},
+  --   keys = {
+  --     { "<leader>o", "<cmd>AerialToggle!<CR>", desc = "Toggle Outline" },
+  --   },
+  -- },
 }
