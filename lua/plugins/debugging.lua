@@ -1,76 +1,86 @@
-#nvim/lua/plugins/debugging.lua
 return {
-  "mfussenegger/nvim-dap-python",
-  keys = {
-    -- **Test-Related Key Mappings**
-    {
-      mode = "n",
-      "<leader>dm",
-      function()
-        require("dap-python").test_method()
-      end,
-      desc = "Debug Test Method",
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "rcarriga/nvim-dap-ui",
+      "mfussenegger/nvim-dap-python",
+      "theHamsta/nvim-dap-virtual-text",
     },
-    {
-      mode = "n",
-      "<leader>dc",
-      function()
-        require("dap-python").test_class()
-      end,
-      desc = "Debug Test Class",
-    },
-    -- **File-Related Key Mappings**
-    {
-      mode = "n",
-      "<leader>df",
-      function()
-        require("dap-python").debug_file()
-      end,
-      desc = "Debug Python File",
-    },
+    config = function()
+      local dap = require("dap")
+      local dapui = require("dapui")
+      local dap_python = require("dap-python")
 
-    -- **Function-Related Key Mappings**
-    {
-      mode = "n",
-      "<leader>du",
-      function()
-        -- Custom function to debug the function under the cursor
-        local dap_python = require("dap-python")
-        local utils = require("dap-python.utils")
-        local path = vim.fn.expand("%:p")
-        local row = vim.fn.line(".")
-        local func_name = utils.get_func_at_line(path, row)
-        if func_name then
-          dap_python.debug_at_point()
-        else
-          print("No function found under cursor.")
-        end
-      end,
-      desc = "Debug Function Under Cursor",
-    },
+      require("dapui").setup({})
+      require("nvim-dap-virtual-text").setup({
+        commented = true, -- Show virtual text alongside comment
+      })
 
-    -- **Class-Related Key Mappings**
-    {
-      mode = "n",
-      "<leader>dk",
-      function()
-        -- Custom function to debug the class under the cursor
-        local dap_python = require("dap-python")
-        local utils = require("dap-python.utils")
-        local path = vim.fn.expand("%:p")
-        local row = vim.fn.line(".")
-        local class_name = utils.get_class_at_line(path, row)
-        if class_name then
-          dap_python.debug_at_point()
-        else
-          print("No class found under cursor.")
-        end
-      end,
-      desc = "Debug Class Under Cursor",
-    },
+      dap_python.setup("python3")
+
+      vim.fn.sign_define("DapBreakpoint", {
+        text = "",
+        texthl = "DiagnosticSignError",
+        linehl = "",
+        numhl = "",
+      })
+
+      vim.fn.sign_define("DapBreakpointRejected", {
+        text = "", -- or "❌"
+        texthl = "DiagnosticSignError",
+        linehl = "",
+        numhl = "",
+      })
+
+      vim.fn.sign_define("DapStopped", {
+        text = "", -- or "→"
+        texthl = "DiagnosticSignWarn",
+        linehl = "Visual",
+        numhl = "DiagnosticSignWarn",
+      })
+
+      -- Automatically open/close DAP UI
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open()
+      end
+
+      local opts = { noremap = true, silent = true }
+
+      -- Toggle breakpoint
+      vim.keymap.set("n", "<leader>db", function()
+        dap.toggle_breakpoint()
+      end, opts)
+
+      -- Continue / Start
+      vim.keymap.set("n", "<leader>dc", function()
+        dap.continue()
+      end, opts)
+
+      -- Step Over
+      vim.keymap.set("n", "<leader>do", function()
+        dap.step_over()
+      end, opts)
+
+      -- Step Into
+      vim.keymap.set("n", "<leader>di", function()
+        dap.step_into()
+      end, opts)
+
+      -- Step Out
+      vim.keymap.set("n", "<leader>dO", function()
+        dap.step_out()
+      end, opts)
+
+      -- Keymap to terminate debugging
+      vim.keymap.set("n", "<leader>dq", function()
+        require("dap").terminate()
+      end, opts)
+
+      -- Toggle DAP UI
+      vim.keymap.set("n", "<leader>du", function()
+        dapui.toggle()
+      end, opts)
+    end,
   },
-  config = function()
-    require("dap-python").setup(vim.g.python3_host_prog)
-    require("dap-python").test_runner = "pytest"
-  end,
 }
