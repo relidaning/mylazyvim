@@ -10,3 +10,5 @@ vim.opt.softtabstop = 2
 vim.opt.expandtab = true
 
 vim.opt.clipboard = "unnamedplus"
+
+vim.g.python3_host_prog = "~/.virtualenvs/debugpy/bin/python"
