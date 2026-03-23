@@ -9,15 +9,34 @@ return {
     },
     config = function()
       local dap = require("dap")
-      local dapui = require("dapui")
-      local dap_python = require("dap-python")
+      dap.configurations.python = {
+        {
+          type = "python",
+          request = "launch",
+          name = "Run module",
+          -- module = "your_app", -- 👈 关键
+          program = "${file}",
+          cwd = "${workspaceFolder}", -- 👈 也很重要
+        },
+      }
 
-      require("dapui").setup({})
+      local dapui = require("dapui")
+      dapui.setup()
+
+      local dap_python = require("dap-python")
+      dap_python.setup("python")
+      -- dap_python.setup(function()
+      --   local venv = os.getenv("VIRTUAL_ENV")
+      --   if venv then
+      --     return venv .. "/bin/python"
+      --   else
+      --     return "python"
+      --   end
+      -- end)
+
       require("nvim-dap-virtual-text").setup({
         commented = true, -- Show virtual text alongside comment
       })
-
-      dap_python.setup("python3")
 
       vim.fn.sign_define("DapBreakpoint", {
         text = "",
