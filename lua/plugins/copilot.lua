@@ -10,5 +10,9 @@ return {
       javascript = true,
       typescript = true,
     },
+    suggestion = {
+      enabled = true,
+      auto_trigger = true,
+    },
   },
 }
